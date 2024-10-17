@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversor de Reais para Criptomoeda</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-image: url('assets/cripto.png'); /* Caminho relativo para a imagem */
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: rgba(255, 255, 255, 0.9); /* Fundo branco com opacidade */
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #007bff;
+        }
+
+        label {
+            display: block;
+            margin: 15px 0 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input[type="number"], select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #result {
+            margin-top: 20px;
+            font-weight: bold;
+            color: #28a745;
+            font-size: 18px;
+        }
+
+        .error {
+            color: #dc3545;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        /* Responsivo */
+        @media (max-width: 768px) {
+            .container {
+                width: 90%;
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Conversor de Reais para Criptomoeda</h1>
+
+        <label for="amount">Valor em Reais:</label>
+        <input type="number" id="amount" placeholder="Digite o valor em reais" value="1000">
+
+        <label for="crypto">Criptomoeda:</label>
+        <select id="crypto">
+            <option value="btc">Bitcoin (BTC)</option>
+            <option value="eth">Ethereum (ETH)</option>
+        </select>
+
+        <button id="convertButton">Converter</button>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        document.getElementById('convertButton').addEventListener('click', function() {
+            const amount = document.getElementById('amount').value;
+            const crypto = document.getElementById('crypto').value;
+
+            // Verifica se o valor inserido é válido
+            if (!amount || amount <= 0) {
+                document.getElementById('result').innerHTML = '<span class="error">Insira um valor válido.</span>';
+                return;
+            }
+
+            // Fazendo a requisição para a API Node.js
+            fetch(`http://localhost:3000/convert?amount=${amount}&crypto=${crypto}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erro na requisição');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Exibe a quantidade de criptomoeda convertida
+                    document.getElementById('result').innerHTML = 
+                        `Você terá aproximadamente <strong>${data.cryptoAmount.toFixed(6)} ${data.crypto.toUpperCase()}</strong>`;
+                })
+                .catch(error => {
+                    // Exibe uma mensagem de erro se algo der errado
+                    document.getElementById('result').innerHTML = '<span class="error">Erro na conversão.</span>';
+                    console.error('Erro:', error);
+                });
+        });
+    </script>
+</body>
+</html>
